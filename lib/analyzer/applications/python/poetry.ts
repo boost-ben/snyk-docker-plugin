@@ -12,21 +12,34 @@ interface ManifestLockPathPair {
 export async function poetryFilesToScannedProjects(
   filePathToContent: FilePathToContent,
 ): Promise<AppDepsScanResultWithoutTarget[]> {
+  console.log("CUSTOM DOCKER PLUGIN: Poetry files scan started");
+  // Try to detect if we're using the custom version
+  console.log("CUSTOM DOCKER PLUGIN: Using custom Poetry lockfile parser");
+  
   const scanResults: AppDepsScanResultWithoutTarget[] = [];
 
   const filePairs = findManifestLockPairsInSameDirectory(filePathToContent);
+  console.log("CUSTOM DOCKER PLUGIN: Found Poetry file pairs:", JSON.stringify(filePairs));
 
   const shouldIncludeDevDependencies = false;
 
   for (const pathPair of filePairs) {
+    console.log("CUSTOM DOCKER PLUGIN: Processing Poetry files:", pathPair.manifest, pathPair.lock);
+    console.log("CUSTOM DOCKER PLUGIN: Manifest content sample:", filePathToContent[pathPair.manifest].substring(0, 200) + "...");
+    console.log("CUSTOM DOCKER PLUGIN: Lock file content sample:", filePathToContent[pathPair.lock].substring(0, 200) + "...");
+    
     const depGraph = await lockFileParser.buildDepGraph(
       filePathToContent[pathPair.manifest],
       filePathToContent[pathPair.lock],
       shouldIncludeDevDependencies,
     );
+    
     if (!depGraph) {
+      console.log("CUSTOM DOCKER PLUGIN: Failed to build Poetry dependency graph");
       continue;
     }
+    
+    console.log("CUSTOM DOCKER PLUGIN: Successfully built Poetry dependency graph");
 
     const depGraphFact: DepGraphFact = {
       type: "depGraph",
