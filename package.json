@@ -1,5 +1,6 @@
 {
   "name": "snyk-docker-plugin",
+  "version": "6.17.1",
   "description": "Snyk CLI docker plugin",
   "author": "snyk.io",
   "license": "Apache-2.0",
